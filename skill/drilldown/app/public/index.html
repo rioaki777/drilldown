@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>drilldown</title>
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="style.css">
+<script src="vendor/mermaid.min.js"></script>
+<script type="module" src="app.js"></script>
+</head>
+<body>
+<div id="app">
+  <header class="topbar">
+    <h1 id="doc-title">読み込み中…</h1>
+    <span id="doc-kind" class="kind-badge"></span>
+    <div class="topbar-buttons">
+      <button type="button" id="btn-close" class="btn" disabled>閉じる</button>
+      <button type="button" id="btn-return" class="btn btn-primary" disabled>判断・指摘を持ち帰る</button>
+    </div>
+  </header>
+  <main class="layout">
+    <div class="pane pane-left">
+      <section id="decisions" hidden></section>
+      <article id="doc" class="doc"></article>
+    </div>
+    <div class="pane pane-right">
+      <section id="threads"></section>
+    </div>
+  </main>
+</div>
+<div id="notice" class="notice" hidden></div>
+<div id="toast" class="toast" role="status" hidden></div>
+</body>
+</html>
