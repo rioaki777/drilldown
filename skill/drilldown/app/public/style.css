@@ -108,11 +108,12 @@ mark.flash { animation: flash-mark 1.4s ease-out; }
 @keyframes flash-mark { 0%, 40% { outline: 3px solid var(--accent); } 100% { outline: 0 solid transparent; } }
 
 /* ---- 決める事項 ---- */
-#decisions { max-width: 52em; margin: 0 auto 16px; }
+#decisions { max-width: 52em; margin: 16px auto 0; }
 .decisions { border: 1px solid var(--border); border-radius: 8px; background: var(--panel); }
 .decisions-summary { cursor: pointer; padding: 8px 12px; font-weight: 600; }
 .decisions-list { padding: 0 12px 8px; }
 .decision { border-top: 1px solid var(--border); padding: 8px 0; }
+.decision-inline { border: 1px solid var(--border); border-radius: 8px; background: var(--panel); padding: 8px 12px; margin: 8px 0 16px; }
 .decision-head { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
 .decision-id { font-family: ui-monospace, monospace; color: var(--muted); font-size: 13px; }
 .decision-title { font-weight: 600; flex: 1; }
@@ -183,7 +184,7 @@ textarea { width: 100%; resize: vertical; }
   background: var(--text); color: var(--bg); padding: 8px 14px; border-radius: 6px; font-size: 13px; max-width: 90vw;
 }
 
-/* ---- 記録（record.html）：上から 決める事項・本文・スレッド ---- */
+/* ---- 記録（record.html）：上から 本文（節の直下の決める事項を含む）・残りの決める事項・スレッド ---- */
 #snapshot-decisions, #snapshot-document, #snapshot-threads, #snapshot-footer { max-width: 52em; margin: 16px auto; padding: 0 16px; }
-#snapshot-threads .thread-quote, #snapshot-decisions .decision-quote, #snapshot-decisions .link-chip { cursor: default; color: var(--text); }
+#snapshot-threads .thread-quote, #snapshot-decisions .decision-quote, #snapshot-decisions .link-chip, #snapshot-document .decision .link-chip { cursor: default; color: var(--text); }
 #snapshot-footer { color: var(--muted); font-size: 13px; }

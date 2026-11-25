@@ -99,12 +99,12 @@ export function buildSnapshotHtml({ title, css, docHtml, decisionsHtml, threadsH
 <style>${safeCss}</style>
 </head>
 <body>
-<section id="snapshot-decisions">
-${stripDanger(decisionsHtml)}
-</section>
 <main id="snapshot-document">
 ${stripDanger(docHtml)}
 </main>
+<section id="snapshot-decisions">
+${stripDanger(decisionsHtml)}
+</section>
 <section id="snapshot-threads">
 ${stripDanger(threadsHtml)}
 </section>

@@ -78,7 +78,7 @@ export function createSelectionMenu({ docEl, threadsEl, onAsk, allowPoint = true
 
   function contextOf(node) {
     const el = node?.nodeType === Node.ELEMENT_NODE ? node : node?.parentElement;
-    if (!el || el.closest('[data-ui], input, textarea, select, button')) return null;
+    if (!el || el.closest('[data-ui], [data-decision-id], input, textarea, select, button')) return null;
     const answer = el.closest('.answer');
     if (answer && threadsEl.contains(answer)) return { root: answer, parentThreadId: answer.dataset.thread, parentTurnId: answer.dataset.turn };
     if (docEl.contains(el)) return { root: docEl };

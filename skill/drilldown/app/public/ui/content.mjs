@@ -90,12 +90,12 @@ export function renderInto(el, md) {
   renderMermaid(el);
 }
 
-// 引用の印の対象になるテキストノード（図の中と操作部品の中は除く）
+// 引用の印の対象になるテキストノード（図の中、操作部品の中、本文に差し込んだ決める事項の欄は除く）
 function textNodes(root) {
   const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, {
     acceptNode(n) {
       const p = n.parentElement;
-      if (!p || p.closest('.mermaid, svg, [data-ui], script, style')) return NodeFilter.FILTER_REJECT;
+      if (!p || p.closest('.mermaid, svg, [data-ui], [data-decision-id], script, style')) return NodeFilter.FILTER_REJECT;
       return NodeFilter.FILTER_ACCEPT;
     },
   });

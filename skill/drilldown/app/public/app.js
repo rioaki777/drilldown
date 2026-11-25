@@ -1,4 +1,4 @@
-// 画面（B 案）：左に解説と「決める事項」、右に選んだ文ごとの質問スレッド。
+// 画面（B 案）：左に解説と「決める事項」（本文の節の直下か、本文の下）、右に選んだ文ごとの質問スレッド。
 import { createApi } from './lib/api.mjs';
 import { buildSnapshotHtml, trySnapshot } from './lib/snapshot.mjs';
 import { runningTurnIds } from './lib/thread-tree.mjs';
@@ -116,7 +116,7 @@ async function main() {
     return Array.from(q).length > 30 ? `${Array.from(q).slice(0, 29).join('')}…` : q;
   };
   const decisionsUi = createDecisions({
-    container: els.decisions, decisions, state,
+    container: els.decisions, docEl: els.doc, decisions, state,
     onChange: (id) => saverFor(id)(),
     onGotoQuote: (id) => gotoMarks(els.doc.querySelectorAll(`mark[data-decision="${CSS.escape(id)}"]`)),
     onGotoThread: (tid) => threadsUi.focus(tid),

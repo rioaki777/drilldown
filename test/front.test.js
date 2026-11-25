@@ -6,6 +6,7 @@ import { renderMarkdown } from '../skill/drilldown/app/public/lib/markdown.mjs';
 import { findQuoteRange } from '../skill/drilldown/app/public/lib/locate-quote.mjs';
 import { buildThreadTree, runningTurnIds } from '../skill/drilldown/app/public/lib/thread-tree.mjs';
 import { buildSnapshotHtml, trySnapshot } from '../skill/drilldown/app/public/lib/snapshot.mjs';
+import { headingMatchesDecision, sectionEnd } from '../skill/drilldown/app/public/lib/decision-slot.mjs';
 
 const { marked } = markedModule;
 const deps = { marked, sanitize: (h) => h };
@@ -159,7 +160,7 @@ test('完全な HTML 文書・順序・エスケープ', () => {
   assert.match(h, /<title>T &lt;&amp;&gt;<\/title>/);
   assert.match(h, /<style>body\{color:red\}<\/style>/);
   assert.match(h, /Content-Security-Policy" content="default-src 'none'; style-src 'unsafe-inline'; img-src data:"/);
-  const order = ['<ul>D</ul>', '<p>a</p>', '<div>TH</div>', '2026-11-24 10:00'].map((s) => h.indexOf(s));
+  const order = ['<p>a</p>', '<ul>D</ul>', '<div>TH</div>', '2026-11-24 10:00'].map((s) => h.indexOf(s));
   assert.ok(order.every((i) => i >= 0));
   assert.deepEqual([...order].sort((a, b) => a - b), order);
 });
@@ -278,3 +279,31 @@ test('trySnapshot は例外なら html なしと理由', () => {
   assert.equal(r.html, undefined);
   assert.equal(r.error, '大きすぎる');
 });
+
+// ---- 決める事項の入力欄を置く節 ----
+test('見出しが事項の id で始まれば対応する', () => {
+  const d = { id: 'd1', title: '再送上限は5回でよいか' };
+  assert.ok(headingMatchesDecision('d1 再送上限は5回でよいか', d));
+  assert.ok(headingMatchesDecision('  d1　別の書き方 ', d));
+  assert.ok(headingMatchesDecision('d1', d));
+  assert.ok(headingMatchesDecision('d1：再送上限', d));
+});
+test('d1 と d10 は区別する', () => {
+  assert.equal(headingMatchesDecision('d10 ほか', { id: 'd1', title: 'x' }), false);
+  assert.equal(headingMatchesDecision('d1a', { id: 'd1', title: 'x' }), false);
+});
+test('id がなくても題名と同じ見出しなら対応する', () => {
+  assert.ok(headingMatchesDecision('再送上限は5回でよいか', { id: 'd1', title: '再送上限は5回でよいか' }));
+  assert.equal(headingMatchesDecision('決める事項', { id: 'd1', title: '' }), false);
+  assert.equal(headingMatchesDecision('再送の間隔', { id: 'd1', title: '再送上限は5回でよいか' }), false);
+});
+test('節の終わりは次の同じか上の階層の見出し', () => {
+  // h2 決める事項, h3 d1, p, p, h3 d2, p, h2 読むときの注意, p
+  const levels = [2, 3, 0, 0, 3, 0, 2, 0];
+  assert.equal(sectionEnd(levels, 1), 4);
+  assert.equal(sectionEnd(levels, 4), 6);
+  assert.equal(sectionEnd(levels, 0), 6);
+  assert.equal(sectionEnd(levels, 6), 8);
+  assert.equal(sectionEnd([3, 4, 0], 0), 3);
+});
+
