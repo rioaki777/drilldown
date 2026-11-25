@@ -6,6 +6,7 @@ import { renderMarkdown } from '../skill/drilldown/app/public/lib/markdown.mjs';
 import { findQuoteRange } from '../skill/drilldown/app/public/lib/locate-quote.mjs';
 import { buildThreadTree, runningTurnIds } from '../skill/drilldown/app/public/lib/thread-tree.mjs';
 import { buildSnapshotHtml, trySnapshot } from '../skill/drilldown/app/public/lib/snapshot.mjs';
+import { isSendKey } from '../skill/drilldown/app/public/lib/keys.mjs';
 import { headingMatchesDecision, sectionEnd } from '../skill/drilldown/app/public/lib/decision-slot.mjs';
 
 const { marked } = markedModule;
@@ -307,3 +308,14 @@ test('節の終わりは次の同じか上の階層の見出し', () => {
   assert.equal(sectionEnd([3, 4, 0], 0), 3);
 });
 
+// ---- 送信キー ----
+test('Enter で送り、Shift+Enter は改行', () => {
+  assert.equal(isSendKey({ key: 'Enter' }), true);
+  assert.equal(isSendKey({ key: 'Enter', ctrlKey: true }), true);
+  assert.equal(isSendKey({ key: 'Enter', shiftKey: true }), false);
+  assert.equal(isSendKey({ key: 'a' }), false);
+});
+test('日本語入力の変換を確定する Enter では送らない', () => {
+  assert.equal(isSendKey({ key: 'Enter', isComposing: true }), false);
+  assert.equal(isSendKey({ key: 'Enter', keyCode: 229 }), false);
+});

@@ -1,6 +1,7 @@
 // 文を選んだときの小メニュー（質問／もっと詳しく／用語／図／メモ／指摘）。指摘は PR のときは出さない。
 // 本文の中で選べば新しいスレッド、回答の中で選べば その回答の子スレッドになる。
 import { h } from './dom.mjs';
+import { isSendKey } from '../lib/keys.mjs';
 
 const ACTIONS = [
   ['question', '質問', true],
@@ -10,9 +11,10 @@ const ACTIONS = [
   ['memo', 'メモ', true],
   ['point', '指摘', true],
 ];
+const KEYS_HINT = 'Enter で送る・Shift+Enter で改行';
 const PLACEHOLDER = {
-  memo: 'メモを書く',
-  point: '指摘を書く（何を直してほしいか。Claude には聞かず、そのまま持ち帰る）',
+  memo: `メモを書く（${KEYS_HINT}）`,
+  point: `指摘を書く（何を直してほしいか。Claude には聞かず、そのまま持ち帰る。${KEYS_HINT}）`,
 };
 const MAX_QUOTE = 4000;
 
@@ -38,7 +40,7 @@ export function createSelectionMenu({ docEl, threadsEl, onAsk, allowPoint = true
           pendingAction = action;
           form.hidden = false;
           input.value = '';
-          input.placeholder = PLACEHOLDER[action] ?? '質問を書く（Ctrl+Enter で送る）';
+          input.placeholder = PLACEHOLDER[action] ?? `質問を書く（${KEYS_HINT}）`;
           input.focus();
           return;
         }
@@ -73,7 +75,7 @@ export function createSelectionMenu({ docEl, threadsEl, onAsk, allowPoint = true
   });
   cancelBtn.addEventListener('click', hide);
   input.addEventListener('keydown', (e) => {
-    if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) { e.preventDefault(); sendBtn.click(); }
+    if (isSendKey(e)) { e.preventDefault(); sendBtn.click(); }
   });
 
   function contextOf(node) {

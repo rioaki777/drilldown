@@ -1,5 +1,6 @@
 // 右側のスレッド欄。buildThreadTree の木を描く。子は親の中に入れて字下げする。
 import { buildThreadTree } from '../lib/thread-tree.mjs';
+import { isSendKey } from '../lib/keys.mjs';
 import { h, debounce, flash, ACTION_LABEL } from './dom.mjs';
 import { renderInto, markQuote } from './content.mjs';
 
@@ -102,7 +103,7 @@ export function createThreads({ container, kind, decisions, state, actions }) {
   }
 
   function renderFollowup(th) {
-    const input = h('textarea', { rows: 2, 'data-draft': `follow:${th.id}`, placeholder: '続けて質問する（Ctrl+Enter で送る）' });
+    const input = h('textarea', { rows: 2, 'data-draft': `follow:${th.id}`, placeholder: '続けて質問する（Enter で送る・Shift+Enter で改行）' });
     const send = () => {
       const q = input.value.trim();
       if (!q) return;
@@ -110,7 +111,7 @@ export function createThreads({ container, kind, decisions, state, actions }) {
       actions.ask({ threadId: th.id, action: 'question', question: q });
     };
     input.addEventListener('keydown', (e) => {
-      if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) { e.preventDefault(); send(); }
+      if (isSendKey(e)) { e.preventDefault(); send(); }
     });
     return h('div', { class: 'followup', 'data-ui': true }, input,
       h('button', { type: 'button', class: 'btn', text: '続けて質問', onclick: send }));
