@@ -62,10 +62,12 @@ export function createThreadManager({
   }
 
   function ask({ threadId, parentThreadId, parentTurnId, quote, action, question } = {}) {
-    if (action !== 'memo' && !RUN_ACTIONS.includes(action)) throw new Error(`知らない操作です：${action}`);
+    if (action !== 'memo' && action !== 'point' && !RUN_ACTIONS.includes(action)) throw new Error(`知らない操作です：${action}`);
     const userText = typeof question === 'string' ? question : '';
     if (action === 'question' && !userText.trim()) throw new Error('質問が空です。');
     if (action === 'memo' && !userText.trim()) throw new Error('メモが空です。');
+    if (action === 'point' && !userText.trim()) throw new Error('指摘が空です。');
+    if (action === 'point' && threadId) throw new Error('指摘は新しいスレッドでだけ作れます。');
 
     let thread;
     if (threadId) {
@@ -99,6 +101,14 @@ export function createThreadManager({
         createdAt: now(),
       };
       state.threads[id] = thread;
+    }
+
+    // 指摘：Claude を呼ばず、回も作らない。スレッドに「指摘として持ち帰る」の印とメモを付けるだけ
+    if (action === 'point') {
+      thread.carryBack = true;
+      thread.note = userText;
+      store.save();
+      return { threadId: thread.id, turnId: null };
     }
 
     const turn = {

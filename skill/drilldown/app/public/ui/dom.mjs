@@ -40,4 +40,4 @@ export function flash(el) {
   el.classList.add('flash');
 }
 
-export const ACTION_LABEL = { question: '質問', detail: 'もっと詳しく', term: '用語', diagram: '図', memo: 'メモ' };
+export const ACTION_LABEL = { question: '質問', detail: 'もっと詳しく', term: '用語', diagram: '図', memo: 'メモ', point: '指摘' };

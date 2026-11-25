@@ -1,4 +1,4 @@
-// 文を選んだときの小メニュー（質問／もっと詳しく／用語／図／メモ）。
+// 文を選んだときの小メニュー（質問／もっと詳しく／用語／図／メモ／指摘）。指摘は PR のときは出さない。
 // 本文の中で選べば新しいスレッド、回答の中で選べば その回答の子スレッドになる。
 import { h } from './dom.mjs';
 
@@ -8,10 +8,15 @@ const ACTIONS = [
   ['term', '用語', false],
   ['diagram', '図', false],
   ['memo', 'メモ', true],
+  ['point', '指摘', true],
 ];
+const PLACEHOLDER = {
+  memo: 'メモを書く',
+  point: '指摘を書く（何を直してほしいか。Claude には聞かず、そのまま持ち帰る）',
+};
 const MAX_QUOTE = 4000;
 
-export function createSelectionMenu({ docEl, threadsEl, onAsk }) {
+export function createSelectionMenu({ docEl, threadsEl, onAsk, allowPoint = true }) {
   let current = null; // {quote, parentThreadId, parentTurnId}
   let pendingAction = null;
 
@@ -24,6 +29,7 @@ export function createSelectionMenu({ docEl, threadsEl, onAsk }) {
   document.body.append(menu);
 
   for (const [action, label, needsText] of ACTIONS) {
+    if (action === 'point' && !allowPoint) continue;
     buttons.append(h('button', {
       type: 'button', class: 'btn', 'data-action': action, text: label,
       onclick: () => {
@@ -32,7 +38,7 @@ export function createSelectionMenu({ docEl, threadsEl, onAsk }) {
           pendingAction = action;
           form.hidden = false;
           input.value = '';
-          input.placeholder = action === 'memo' ? 'メモを書く' : '質問を書く（Ctrl+Enter で送る）';
+          input.placeholder = PLACEHOLDER[action] ?? '質問を書く（Ctrl+Enter で送る）';
           input.focus();
           return;
         }

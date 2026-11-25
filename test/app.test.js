@@ -219,6 +219,8 @@ test('pr では return を拒否し、持ち帰りの指定も拒否する', asy
     const { threadId } = await (await s.api('/api/ask', { method: 'POST', body: { quote: 'q', action: 'memo', question: 'メモ' } })).json();
     const c = await s.api(`/api/thread/${threadId}`, { method: 'PUT', body: { carryBack: true } });
     assert.equal(c.status, 400);
+    const pt = await s.api('/api/ask', { method: 'POST', body: { quote: 'q', action: 'point', question: '指摘' } });
+    assert.equal(pt.status, 400, 'pr では指摘も作れない');
     assert.equal((await s.api(`/api/thread/${threadId}`, { method: 'PUT', body: { carryBack: false, note: 'n' } })).status, 200);
     const r = await s.api('/api/finish', { method: 'POST', body: { mode: 'return', snapshotHtml: '<p>x</p>' } });
     assert.equal(r.status, 400);

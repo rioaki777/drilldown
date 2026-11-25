@@ -171,6 +171,15 @@ test('判断材料のメモは「メモ：<text>」で載る', () => {
   assert.ok(!md.includes('Q あとで見る'));
 });
 
+test('質問のない指摘（回のないスレッド）は要旨なしで載る', () => {
+  const s = makeState();
+  s.threads.t9 = { id: 't9', parentThreadId: null, parentTurnId: null, quote: 'ジョブ基盤', sessionId: null, carryBack: true, note: '名前を統一してほしい', decisionIds: [], turnIds: [], createdAt: '2026-11-24T11:00:00.000Z' };
+  const md = renderReturnMd(args({ state: s }));
+  assert.match(md, /^- 「ジョブ基盤」について：名前を統一してほしい$/m);
+  const rec = renderRecordMd({ title: 't', sources: [], mainMd: 'x', state: s, decisions });
+  assert.match(rec, /^- 「ジョブ基盤」（メインの会話に持ち帰る）\n {2}持ち帰りメモ：名前を統一してほしい$/m);
+});
+
 test('record.md：題名・元の文書・決める事項・スレッド・解説の順', () => {
   const md = renderRecordMd({ title: '通知の設計', sources: ['docs/notify.md', 'issue #3'], mainMd: '# 解説本文\n本文です。', state: makeState(), decisions });
   const order = ['# 通知の設計', '## 元の文書', '## 決める事項と判断', '## スレッド', '## 解説'].map((h) => md.indexOf(h));

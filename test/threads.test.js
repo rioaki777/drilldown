@@ -292,6 +292,36 @@ test('memo は run を呼ばない', async () => {
   assert.equal(mgr.isBusy(), false);
 });
 
+test('point は run を呼ばず、回も作らず、持ち帰りの印とメモを付ける', async () => {
+  const { mgr, calls, store } = setup();
+  const r = mgr.ask({ quote: '最大5回', action: 'point', question: '回数の根拠を書いてほしい' });
+  await mgr.idle();
+  assert.equal(calls.length, 0);
+  assert.equal(r.turnId, null);
+  const th = store.state.threads[r.threadId];
+  assert.equal(th.quote, '最大5回');
+  assert.equal(th.carryBack, true);
+  assert.equal(th.note, '回数の根拠を書いてほしい');
+  assert.deepEqual(th.turnIds, []);
+  assert.deepEqual(store.state.turns, {});
+  assert.equal(mgr.isBusy(), false);
+});
+
+test('point は空なら Error、既存のスレッドには使えない', () => {
+  const { mgr } = setup();
+  assert.throws(() => mgr.ask({ quote: 'q', action: 'point', question: ' ' }), /指摘が空/);
+  const { threadId } = mgr.ask({ quote: 'q', action: 'memo', question: 'm' });
+  assert.throws(() => mgr.ask({ threadId, action: 'point', question: 'x' }), /新しいスレッド/);
+});
+
+test('point は回答の文から子スレッドとして作れる', () => {
+  const { mgr, store } = setup();
+  const p = mgr.ask({ quote: 'q', action: 'memo', question: 'm' });
+  const c = mgr.ask({ parentThreadId: p.threadId, parentTurnId: p.turnId, quote: 'x', action: 'point', question: '直して' });
+  assert.equal(store.state.threads[c.threadId].parentThreadId, p.threadId);
+  assert.equal(store.state.threads[c.threadId].carryBack, true);
+});
+
 test('メインの ID は一覧に入らない', async () => {
   const { mgr, called, store } = setup();
   const a = mgr.ask({ quote: 'q', action: 'detail' });

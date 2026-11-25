@@ -237,6 +237,7 @@ export async function createApp({
       if (closing()) return send(res, 503, { error: '終了処理中です' });
       try {
         const { threadId, parentThreadId, parentTurnId, quote, action, question } = body;
+        if (action === 'point' && doc.kind === 'pr') return send(res, 400, { error: 'PR の確認ではメインの会話への持ち帰りはできません' });
         return send(res, 200, manager.ask({ threadId, parentThreadId, parentTurnId, quote, action, question }));
       } catch (e) {
         return send(res, 400, { error: e.message });

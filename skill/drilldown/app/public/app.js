@@ -240,7 +240,7 @@ async function main() {
   els.doc.addEventListener('click', onMarkClick);
   els.threads.addEventListener('click', (e) => { if (e.target.closest?.('.answer')) onMarkClick(e); });
 
-  const menu = createSelectionMenu({ docEl: els.doc, threadsEl: els.threads, onAsk: ask });
+  const menu = createSelectionMenu({ docEl: els.doc, threadsEl: els.threads, onAsk: ask, allowPoint: !isPr });
 
   // ---- 終わる ----
   async function finish(mode) {
