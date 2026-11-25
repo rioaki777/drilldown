@@ -6,6 +6,7 @@ import { renderMarkdown } from '../skill/drilldown/app/public/lib/markdown.mjs';
 import { findQuoteRange } from '../skill/drilldown/app/public/lib/locate-quote.mjs';
 import { buildThreadTree, runningTurnIds } from '../skill/drilldown/app/public/lib/thread-tree.mjs';
 import { buildSnapshotHtml, trySnapshot } from '../skill/drilldown/app/public/lib/snapshot.mjs';
+import { clampSplit, DEFAULT_SPLIT } from '../skill/drilldown/app/public/lib/split.mjs';
 import { isSendKey } from '../skill/drilldown/app/public/lib/keys.mjs';
 import { headingMatchesDecision, sectionEnd } from '../skill/drilldown/app/public/lib/decision-slot.mjs';
 
@@ -318,4 +319,18 @@ test('Enter で送り、Shift+Enter は改行', () => {
 test('日本語入力の変換を確定する Enter では送らない', () => {
   assert.equal(isSendKey({ key: 'Enter', isComposing: true }), false);
   assert.equal(isSendKey({ key: 'Enter', keyCode: 229 }), false);
+});
+
+// ---- 本文とスレッドの幅 ----
+test('幅の割合はそのまま使う', () => {
+  assert.equal(clampSplit(0.5, 1000, 280, 280), 0.5);
+});
+test('どちらの欄も最小の幅を下回らない', () => {
+  assert.equal(clampSplit(0.1, 1000, 280, 280), 0.28);
+  assert.equal(clampSplit(0.95, 1000, 280, 280), 0.72);
+});
+test('画面が狭すぎるときや値がおかしいときは既定の割合', () => {
+  assert.equal(clampSplit(0.5, 500, 280, 280), DEFAULT_SPLIT);
+  assert.equal(clampSplit(Number.NaN, 1000, 280, 280), DEFAULT_SPLIT);
+  assert.equal(clampSplit(0.5, 0, 280, 280), DEFAULT_SPLIT);
 });

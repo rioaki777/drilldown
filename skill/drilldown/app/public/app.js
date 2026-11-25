@@ -7,6 +7,7 @@ import { renderInto, markQuote } from './ui/content.mjs';
 import { createDecisions } from './ui/decisions.mjs';
 import { createThreads } from './ui/threads.mjs';
 import { createSelectionMenu } from './ui/selection.mjs';
+import { createSplitter } from './ui/splitter.mjs';
 import { collectSnapshotParts } from './ui/snapshot-dom.mjs';
 
 const TOKEN_KEY = 'drilldown-token';
@@ -76,6 +77,7 @@ async function main() {
   els.title.textContent = doc.title;
   els.kind.textContent = KIND_LABEL[doc.kind] ?? doc.kind;
   if (isPr) els.ret.remove();
+  createSplitter({ layout: document.querySelector('.layout'), handle: $('splitter') });
 
   // 保存中の要求（終わる前に待つ）
   const inflight = new Set();
